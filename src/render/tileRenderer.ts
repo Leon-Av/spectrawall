@@ -7,6 +7,7 @@ import type { Renderer } from './context';
 import type { WallpaperParams } from '../core/params';
 import { resolveStructure } from '../core/params';
 import { createPng, PngEncodeCanceled } from './png';
+import { yieldUI } from './yield';
 
 export class ExportCanceled extends Error {
   constructor() {
@@ -90,7 +91,7 @@ async function exportPng(
         await png.row(fullRow);
       }
       // yield to the event loop so UI/progress repaints
-      await new Promise((r) => setTimeout(r, 0));
+      await yieldUI();
     }
     checkCancel(opts);
     opts.onProgress?.(totalTiles, totalTiles);
@@ -141,7 +142,7 @@ async function exportJpeg(
       ctx.putImageData(img, x0, y0);
       done++;
       opts.onProgress?.(done, totalTiles);
-      await new Promise((r) => setTimeout(r, 0));
+      await yieldUI();
     }
   }
   opts.onProgress?.(totalTiles, totalTiles);

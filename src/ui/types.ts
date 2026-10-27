@@ -10,6 +10,8 @@ export interface App {
   params: WallpaperParams;
   resolution: ResolutionChoice;
   autosave: boolean;
+  /** live animation preview is playing */
+  playing: boolean;
   /** re-render preview + sync control values (cheap) */
   refresh(): void;
   /** full rebuild of header + sidebar (language switch) */

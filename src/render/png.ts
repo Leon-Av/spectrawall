@@ -16,7 +16,8 @@ const CRC_TABLE = (() => {
   return t;
 })();
 
-function crc32(crc: number, data: Uint8Array): number {
+/** CRC-32 (IEEE), incremental: pass 0 to start. Exported for the ZIP writer. */
+export function crc32(crc: number, data: Uint8Array): number {
   crc = ~crc >>> 0;
   for (let i = 0; i < data.length; i++) {
     crc = (CRC_TABLE[(crc ^ data[i]) & 0xff] ^ (crc >>> 8)) >>> 0;

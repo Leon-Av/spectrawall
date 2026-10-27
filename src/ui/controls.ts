@@ -31,6 +31,7 @@ export function buildSidebar(root: HTMLElement, app: App): SidebarHandles {
     paletteSection(app, updaters),
     backgroundSection(app, updaters),
     effectsSection(app, updaters),
+    animationSection(app, updaters),
     advancedSection(app, updaters),
     canvasSection(app, updaters),
   );
@@ -281,6 +282,45 @@ function effectsSection(app: App, updaters: (() => void)[]): HTMLElement {
       app.refresh();
     }, (v) => Math.round(v * 100) + '%'),
   );
+}
+
+function animationSection(app: App, updaters: (() => void)[]): HTMLElement {
+  const playBtn = h('button', { class: 'btn ghost small', type: 'button' }) as HTMLButtonElement;
+  const syncPlay = () => {
+    playBtn.textContent = app.playing ? '⏸ ' + t('anim.pause') : '▶ ' + t('anim.play');
+  };
+  playBtn.addEventListener('click', () => {
+    app.playing = !app.playing;
+    syncPlay();
+  });
+
+  const loop = sliderRow(
+    t('anim.loop'),
+    4,
+    60,
+    1,
+    () => app.params.animation.loopSeconds,
+    (v) => {
+      app.params.animation.loopSeconds = v;
+      app.refresh();
+    },
+    (v) => v + ' s',
+  );
+  const motion = sliderRow(
+    t('anim.motion'),
+    0,
+    0.5,
+    0.01,
+    () => app.params.animation.motion,
+    (v) => {
+      app.params.animation.motion = v;
+      if (app.playing) app.refresh();
+    },
+    (v) => Math.round(v * 200) + '%',
+  );
+  updaters.push(loop.sync, motion.sync, syncPlay);
+  syncPlay();
+  return section('section.animation', playBtn, loop.el, motion.el);
 }
 
 function advancedSection(app: App, updaters: (() => void)[]): HTMLElement {
