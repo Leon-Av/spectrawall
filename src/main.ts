@@ -35,6 +35,9 @@ let sidebar: SidebarHandles | null = null;
 let app: App | null = null;
 let dirty = true;
 let resolved: ResolvedStructure | null = null;
+let playing = false;
+let phase = 0;
+let lastTs = 0;
 
 // ---------- boot ----------
 
@@ -111,6 +114,13 @@ async function boot(): Promise<void> {
       autosave = v;
       localStorage.setItem('sw.autosave', v ? '1' : '0');
     },
+    get playing() {
+      return playing;
+    },
+    set playing(v) {
+      playing = v;
+      dirty = true;
+    },
     refresh,
     rebuildUI,
     updateSeedInput,
@@ -133,11 +143,24 @@ async function boot(): Promise<void> {
 
 // ---------- preview loop ----------
 
-function loop(): void {
+function loop(ts: number): void {
+  const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.25) : 0;
+  lastTs = ts;
+  if (playing) {
+    // phase advances around the full circle once per loop => seamless
+    phase = (phase + (dt / params.animation.loopSeconds) * Math.PI * 2) % (Math.PI * 2);
+    dirty = true;
+  }
   if (dirty && renderer) {
     dirty = false;
     resolved = resolveStructure(params);
-    renderer.renderPreview(params, resolved, 0, 0);
+    // paused preview renders the exact still image (phase 0, no motion)
+    renderer.renderPreview(
+      params,
+      resolved,
+      playing ? phase : 0,
+      playing ? params.animation.motion : 0,
+    );
   }
   requestAnimationFrame(loop);
 }

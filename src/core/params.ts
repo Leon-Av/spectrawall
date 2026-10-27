@@ -41,7 +41,8 @@ export interface WallpaperParams {
   vignette: number; // 0..1
   structure: Structure;
   animation: {
-    loopSeconds: number; // 4..60, reserved for iteration 2
+    loopSeconds: number; // 4..60 — one seamless loop
+    motion: number; // 0..0.5 — how far the pattern travels through noise-time
   };
 }
 
@@ -60,7 +61,7 @@ export function defaultParams(): WallpaperParams {
     grain: { strength: 0.18, size: 1.6 },
     vignette: 0.25,
     structure: { layers: null, scale: null, warp: null, streaks: null, intensity: null },
-    animation: { loopSeconds: 12 },
+    animation: { loopSeconds: 12, motion: 0.16 },
   };
   rerollPalette(p, 'dark');
   return p;
@@ -240,7 +241,10 @@ export function sanitizeParams(raw: unknown): WallpaperParams {
 
   // animation
   const an = r.animation as Record<string, unknown> | undefined;
-  if (an) out.animation.loopSeconds = clamp(an.loopSeconds, 4, 60, d.animation.loopSeconds);
+  out.animation = {
+    loopSeconds: clamp(an?.loopSeconds, 4, 60, d.animation.loopSeconds),
+    motion: clamp(an?.motion, 0, 0.5, d.animation.motion),
+  };
 
   return out;
 }

@@ -151,6 +151,13 @@ export class Renderer {
     return buf;
   }
 
+  /** Read the last rendered tile into a caller-provided RGBA buffer. */
+  readTileInto(buf: Uint8Array): void {
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.tileFbo);
+    gl.readPixels(0, 0, this.tileW, this.tileH, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+  }
+
   /** Render straight into the visible preview canvas. */
   renderPreview(p: WallpaperParams, s: ResolvedStructure, phase: number, motion: number): void {
     const gl = this.gl;

@@ -13,6 +13,7 @@
 - **Three generative styles** — Silk waves, Aurora, Soft mesh — all GPU-rendered (WebGL2).
 - **Any resolution**: FHD / QHD / 4K / 5K / 8K / **16K** (15360×8640), ultrawide, phone sizes, or any custom W×H up to 16384×16384. Export renders in tiles, so huge images work on any GPU.
 - **Deterministic seeds**: every wallpaper is defined by a seed string plus parameters. Same seed → identical picture at any resolution, on any OS.
+- **Animated wallpapers (v0.2)**: seamlessly looping animation with a live preview. Export as **MP4 (H.264)** or **WebM (VP9)** via WebCodecs, or as a **ZIP of PNG frames** for external encoders. Choose duration (4–60 s), frame rate (24/30/60 fps) and resolution (up to 4K).
 - **Detailed controls**:
   - palette: up to 6 colors, editable, lockable, or one-click harmonious random palettes (OKLCH color space);
   - dark / light theme or a custom background color;
@@ -48,10 +49,12 @@ The wallpaper is a single GLSL fragment shader: a seeded, domain-warped noise fl
 
 Export renders the scene in up-to-4096-px tiles (with a uniform pixel offset — seamless by construction) and streams them through a native `CompressionStream`-based PNG encoder — no canvas size limits, no giant memory spikes.
 
+The animation moves the noise field along a **closed circle in noise-time**: frame *i* of *N* samples the field at phase `2π·i/N`, so the last frame flows into the first — every export is a mathematically perfect loop, with no crossfades or seams.
+
 ## Roadmap
 
 - [x] **v0.1 — still images**: 3 styles, seeds, palettes, effects, tiled export to 16K, history, share links, EN/RU.
-- [ ] **v0.2 — animated wallpapers**: seamlessly looping animation (the noise field already moves on a closed circle in noise-time), live preview, and video export — MP4 (WebCodecs), WebM fallback, or a ZIP of PNG frames for external encoders.
+- [x] **v0.2 — animated wallpapers**: seamless loops, live preview, video export — MP4 (WebCodecs), WebM fallback, ZIP of PNG frames.
 
 ## Contributing
 
