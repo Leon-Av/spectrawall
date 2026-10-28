@@ -8,7 +8,7 @@ import { rngFromSeed, newSeed } from './rng';
 import { generatePalette, hexToRgb, rgbToHex } from './palette';
 import type { Rng } from './rng';
 
-export type Style = 'silk' | 'mesh' | 'aurora';
+export type Style = 'silk' | 'mesh' | 'aurora' | 'dunes' | 'nebula' | 'rays';
 export type ThemeMode = 'dark' | 'light' | 'custom';
 
 /** Structure values can be locked by the user; null = derive from seed. */
@@ -182,7 +182,11 @@ export function sanitizeParams(raw: unknown): WallpaperParams {
       typeof r.seed === 'string' && r.seed.length > 0 && r.seed.length <= 64
         ? r.seed
         : d.seed,
-    style: pickEnum(r.style, ['silk', 'mesh', 'aurora'] as const, 'silk'),
+    style: pickEnum(
+      r.style,
+      ['silk', 'mesh', 'aurora', 'dunes', 'nebula', 'rays'] as const,
+      'silk',
+    ),
     palette: d.palette,
     background: d.background,
     colorShare: clamp(r.colorShare, 0, 1, d.colorShare),

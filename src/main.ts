@@ -247,7 +247,8 @@ async function saveToHistory(): Promise<void> {
 function randomizeAll(): void {
   if (!app) return;
   rerollSeed(app.params);
-  app.params.style = (['silk', 'mesh', 'aurora'] as const)[Math.floor(Math.random() * 3)];
+  const styles = ['silk', 'mesh', 'aurora', 'dunes', 'nebula', 'rays'] as const;
+  app.params.style = styles[Math.floor(Math.random() * styles.length)];
   app.params.colorShare = 0.3 + Math.random() * 0.45;
   app.params.blur = 0.15 + Math.random() * 0.5;
   app.params.vignette = Math.random() * 0.4;

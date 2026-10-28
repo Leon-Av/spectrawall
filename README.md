@@ -10,7 +10,7 @@
 
 ## Features
 
-- **Three generative styles** — Silk waves, Aurora, Soft mesh — all GPU-rendered (WebGL2).
+- **Six generative styles** — Silk waves, Aurora, Soft mesh, Dunes, Nebula (with stars), Neon lines — all GPU-rendered (WebGL2).
 - **Any resolution**: FHD / QHD / 4K / 5K / 8K / **16K** (15360×8640), ultrawide, phone sizes, or any custom W×H up to 16384×16384. Export renders in tiles, so huge images work on any GPU.
 - **Deterministic seeds**: every wallpaper is defined by a seed string plus parameters. Same seed → identical picture at any resolution, on any OS.
 - **Animated wallpapers (v0.2)**: seamlessly looping animation with a live preview. Export as **MP4 (H.264)** or **WebM (VP9)** via WebCodecs, or as a **ZIP of PNG frames** for external encoders. Choose duration (4–60 s), frame rate (24/30/60 fps) and resolution (up to 4K).
@@ -45,7 +45,7 @@ Exporting 8K–16K images is best done in a desktop browser with a few GB of fre
 
 ## How rendering works
 
-The wallpaper is a single GLSL fragment shader: a seeded, domain-warped noise flow mapped through your palette, with style-specific structure (anisotropic silk sheets, vertical aurora curtains, or gaussian color blobs for the mesh style). All coordinates are aspect-normalized, so composition is resolution-independent; film grain is computed in absolute pixels so the grain in preview matches the 16K export exactly. Dithering is applied to eliminate banding on dark gradients.
+The wallpaper is a single GLSL fragment shader: a seeded, domain-warped noise flow mapped through your palette, with style-specific structure (anisotropic silk sheets, vertical aurora curtains, gaussian color blobs for the mesh style, stacked rim-lit dune ridges, turbulent nebula clouds with a star field, or wavy neon lines). All coordinates are aspect-normalized, so composition is resolution-independent; film grain is computed in absolute pixels so the grain in preview matches the 16K export exactly. Dithering is applied to eliminate banding on dark gradients.
 
 Export renders the scene in up-to-4096-px tiles (with a uniform pixel offset — seamless by construction) and streams them through a native `CompressionStream`-based PNG encoder — no canvas size limits, no giant memory spikes.
 

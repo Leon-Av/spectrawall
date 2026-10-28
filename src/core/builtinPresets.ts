@@ -135,4 +135,43 @@ export const BUILTIN_PRESETS: Preset[] = [
       vignette: 0.06,
     }),
   },
+  {
+    id: 'violet-dunes',
+    nameKey: 'preset.violetDunes',
+    params: make('dune-6427', 'dunes', {
+      colors: ['#141230', '#4c3a99', '#a855f7', '#fbcfe8'],
+      theme: 'dark',
+      colorShare: 0.6,
+      blur: 0.3,
+      grain: { strength: 0.16, size: 1.6 },
+      vignette: 0.3,
+      structure: { layers: 5, streaks: 0.8, warp: 1.2 },
+    }),
+  },
+  {
+    id: 'deep-space',
+    nameKey: 'preset.deepSpace',
+    params: make('orbit-8119', 'nebula', {
+      colors: ['#312e81', '#7c3aed', '#c026d3', '#f0abfc'],
+      theme: 'dark',
+      colorShare: 0.7,
+      blur: 0.4,
+      grain: { strength: 0.14, size: 1.5 },
+      vignette: 0.35,
+      structure: { layers: 6, streaks: 0.9, warp: 1.5 },
+    }),
+  },
+  {
+    id: 'light-rays',
+    nameKey: 'preset.lightRays',
+    params: make('glow-3345', 'rays', {
+      colors: ['#022c22', '#065f46', '#10b981', '#a7f3d0'],
+      theme: 'dark',
+      colorShare: 0.55,
+      blur: 0.25,
+      grain: { strength: 0.15, size: 1.5 },
+      vignette: 0.3,
+      structure: { streaks: 1.0, warp: 1.2 },
+    }),
+  },
 ];

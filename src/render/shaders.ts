@@ -222,6 +222,102 @@ vec3 sceneMesh(vec2 p) {
   return mix(uBg, avg * uIntensity * detail, cov);
 }
 
+// stacked flowing ridges: sky on top, bands colored by their palette slot
+vec3 sceneDunes(vec2 p) {
+  float aspect = uResolution.x / uResolution.y;
+  vec2 q = vec2(p.x * aspect, p.y);
+  vec3 col = uBg;
+  float n = max(uLayers, 1.0);
+  float top = mix(0.9, 0.45, uColorShare);
+  float bottom = mix(-0.25, -0.75, uColorShare);
+  for (int j = 0; j < 8; j++) {
+    if (float(j) >= n) break;
+    float fj = float(j);
+    float t = n > 1.5 ? fj / (n - 1.0) : 0.5;
+    // paint top curves first: lower bands stack over them, sky stays above
+    float yc = mix(top, bottom, t);
+    float w = fbm(vec2(
+      q.x * uScale * (0.85 + 0.18 * fj) + uShift.x + fj * 17.3,
+      uShift.y * 0.7 + fj * 7.9
+    ) + motion(0.25 + 0.12 * fj));
+    yc += uWarp * (w - 0.5) * 0.95;
+    float d = q.y - yc; // >0 above the ridge line
+    float soft = mix(0.2, 0.05, uBlur);
+    float fill = 1.0 - smoothstep(-soft, soft, d);
+    vec3 c = paletteAt(t) * uIntensity;
+    // shading inside the band: brighter near the crest, darker at depth
+    c *= 0.6 + 0.55 * clamp(1.0 - max(d, 0.0) * 2.0, 0.0, 1.0);
+    c *= 0.72 + 0.5 * w;
+    // crest rim light
+    float crest = pow(clamp(1.0 - abs(d) * mix(10.0, 4.5, uBlur), 0.0, 1.0), 3.0);
+    c += brighten(c) * crest * uStreaks * 0.7;
+    col = mix(col, c, fill);
+  }
+  return col;
+}
+
+// deep turbulent clouds with a sparse star field
+vec3 sceneNebula(vec2 p) {
+  vec2 q = rot2(uRot) * p;
+  q *= uScale * mix(1.3, 0.7, uBlur);
+  q += uShift;
+  vec2 m1 = motion(0.45);
+  float w1 = fbm(q * 0.9 + m1);
+  float w2 = fbm(q * 1.7 + m1 * 1.3 + vec2(4.7, 1.9));
+  vec2 qq = q + uWarp * 1.6 * vec2(w1 - 0.5, w2 - 0.5);
+  float v = fbm(qq * 1.1 + vec2(w2 * 0.5));
+  v = v * v * (3.0 - 2.0 * v);
+  v = smoothstep(0.28, 0.9, v); // stretch: full palette range from deep bg to bright cores
+  float cov = coverageRamp(v);
+  vec3 col = mix(uBg, paletteAt(palettePos(v)) * uIntensity, cov);
+  // second color layer: darker deep tones for the shadow clouds
+  float v2 = fbm(qq * 2.3 + m1 * 0.7 + vec2(9.1, 3.3));
+  float cov2 = coverageRamp(v2) * 0.5;
+  vec3 deep = paletteAt(clamp(palettePos(v2) * 0.45, 0.0, 1.0)) * uIntensity;
+  col = mix(col, deep, cov2 * (1.0 - cov * 0.6));
+  // sparse stars (grid in normalized coords => resolution independent)
+  if (uStreaks > 0.001) {
+    vec2 gp = p * mix(30.0, 55.0, fract(uShift.x * 0.013)) * uScale + motion(0.15) * 6.0;
+    vec2 id = floor(gp);
+    vec2 f = fract(gp) - 0.5;
+    float rnd = hash12(id + floor(uShift));
+    vec2 off = (hash22(id + floor(uShift) + vec2(3.1)) - 0.5) * 0.6;
+    float ds = length(f - off);
+    float tw = 0.75 + 0.25 * sin(uPhase * 3.0 + rnd * 40.0);
+    float star = step(0.94, rnd) * pow(clamp(1.0 - ds * 3.0, 0.0, 1.0), 9.0);
+    col += vec3(star * uStreaks * tw * 1.3 * (0.35 + 0.65 * (1.0 - cov)));
+  }
+  return col;
+}
+
+// wide soft light beams wandering across the frame
+vec3 sceneRays(vec2 p) {
+  vec2 q = rot2(uRot) * p;
+  q.x *= mix(0.5, 0.85, uBlur);
+  q *= uScale * mix(1.4, 0.8, uBlur);
+  q += uShift;
+  vec2 m1 = motion(0.5);
+  float w = fbm(vec2(q.y * 0.5, q.x * 0.15) + m1);
+  float beamCoord = q.x + uWarp * (w - 0.5) * 1.3;
+  float v = fbm(q * 0.8 + m1 * 0.6 + vec2(7.7, 2.2));
+  float cov = coverageRamp(smoothstep(0.25, 0.85, v));
+  vec3 col = mix(uBg, paletteAt(palettePos(v)) * uIntensity, cov);
+  // beams fade toward one side, like shafts from behind the horizon
+  float fadeY = smoothstep(-0.75, 0.9, q.y + m1.x * 0.25);
+  float s1 = 0.5 + 0.5 * sin(beamCoord * 18.0 + sin(beamCoord * 3.2) * 1.8);
+  float b1 = pow(s1, mix(5.0, 2.2, uBlur));
+  float s2 = 0.5 + 0.5 * sin(beamCoord * 36.0 + 2.0 + sin(beamCoord * 6.0) * 1.2);
+  float b2 = pow(s2, mix(16.0, 7.0, uBlur));
+  vec3 beamCol = brighten(paletteAt(0.75));
+  vec3 thinCol = brighten(paletteAt(0.4));
+  float k = uStreaks * (0.3 + 0.7 * cov);
+  // break the beams into uneven glowing shafts
+  float shaftVar = 0.3 + 0.9 * fbm(vec2(beamCoord * 1.3, q.y * 0.25 + 5.0) + m1 * 0.8);
+  col = mix(col, beamCol, clamp(b1 * k * fadeY * shaftVar, 0.0, 1.0));
+  col = mix(col, thinCol, clamp(b2 * uStreaks * fadeY * shaftVar * 0.7, 0.0, 1.0));
+  return col;
+}
+
 // ---------- main ----------
 
 void main() {
@@ -233,6 +329,9 @@ void main() {
   vec3 col;
   if (uStyle == 1) col = sceneMesh(p);
   else if (uStyle == 2) col = sceneAurora(p);
+  else if (uStyle == 3) col = sceneDunes(p);
+  else if (uStyle == 4) col = sceneNebula(p);
+  else if (uStyle == 5) col = sceneRays(p);
   else col = sceneSilk(p);
 
   // vignette (radial, toward black — natural on any theme)

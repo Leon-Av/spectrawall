@@ -103,10 +103,12 @@ function presetSection(app: App, updaters: (() => void)[]): HTMLElement {
   return section('section.presets', select);
 }
 
+const STYLE_KEYS = ['silk', 'mesh', 'aurora', 'dunes', 'nebula', 'rays'] as const;
+
 function styleSection(app: App, updaters: (() => void)[]): HTMLElement {
   const wrap = h('div', { class: 'style-cards' });
   const cards: HTMLButtonElement[] = [];
-  for (const s of ['silk', 'mesh', 'aurora'] as const) {
+  for (const s of STYLE_KEYS) {
     const card = h(
       'button',
       {
@@ -125,7 +127,7 @@ function styleSection(app: App, updaters: (() => void)[]): HTMLElement {
   }
   updaters.push(() => {
     cards.forEach((c, i) => {
-      c.classList.toggle('active', app.params.style === ['silk', 'mesh', 'aurora'][i]);
+      c.classList.toggle('active', app.params.style === STYLE_KEYS[i]);
     });
   });
   return section('section.style', wrap);
