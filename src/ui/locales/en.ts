@@ -29,6 +29,9 @@ export const en: Record<string, string> = {
   'preset.mistForest': 'Mist Forest',
   'preset.auroraBorealis': 'Aurora Borealis',
   'preset.daylightHaze': 'Daylight Haze',
+  'preset.violetDunes': 'Violet Dunes',
+  'preset.deepSpace': 'Deep Space',
+  'preset.lightRays': 'Neon Waves',
 
   'style.silk': 'Silk waves',
   'style.silk.hint': 'Flowing silky sheets of light',
@@ -36,6 +39,12 @@ export const en: Record<string, string> = {
   'style.mesh.hint': 'Smooth blurred color blobs',
   'style.aurora': 'Aurora',
   'style.aurora.hint': 'Turbulent glowing curtains',
+  'style.dunes': 'Dunes',
+  'style.dunes.hint': 'Stacked flowing ridges with rim light',
+  'style.nebula': 'Nebula',
+  'style.nebula.hint': 'Deep turbulent clouds with stars',
+  'style.rays': 'Neon lines',
+  'style.rays.hint': 'Glowing wavy lines of light',
 
   'palette.count': 'Number of colors',
   'palette.reroll': 'Reroll palette',

@@ -85,7 +85,10 @@ export class Renderer {
 
     gl.uniform2f(this.u('uResolution'), full.width, full.height);
     gl.uniform2f(this.u('uPixelOffset'), offset.x, offset.y);
-    gl.uniform1i(this.u('uStyle'), p.style === 'mesh' ? 1 : p.style === 'aurora' ? 2 : 0);
+    gl.uniform1i(
+      this.u('uStyle'),
+      p.style === 'mesh' ? 1 : p.style === 'aurora' ? 2 : p.style === 'dunes' ? 3 : p.style === 'nebula' ? 4 : p.style === 'rays' ? 5 : 0,
+    );
     const bg = hexToRgb(backgroundHex(p));
     gl.uniform3f(this.u('uBg'), bg.r, bg.g, bg.b);
     const colors: number[] = [];
